@@ -1,0 +1,29 @@
+People = []
+total_amount = int(input("What is the total amount? "))
+individual_amounts = []
+
+num_people = int(input("How many people are there? "))
+
+for i in range(num_people):
+    person = input("Who is it? ")
+    People.append(person)
+
+pay_equally = input("Do you want everyone to pay equally? (yes/no) ")
+
+if pay_equally == "yes":
+    amount_per_person = total_amount / num_people
+    print("Each person has to pay:", amount_per_person)
+else:
+    for i in range(num_people):
+        individual_amount = int(input(f"How much should {People[i]} pay separately? "))
+        individual_amounts.append(individual_amount)
+        print(individual_amounts)
+
+individual_total = sum(individual_amounts)
+remaining_total = total_amount - individual_total
+shared_amount = remaining_total / num_people
+
+print("Each person has to pay an additional:", shared_amount)
+
+for i in range(num_people):
+    print(f"{People[i]} has to pay: {individual_amounts[i]} + {shared_amount} = {individual_amounts[i] + shared_amount:.2f}")
