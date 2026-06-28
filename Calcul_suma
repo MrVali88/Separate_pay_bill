@@ -1,29 +1,50 @@
-People = []
-total_amount = int(input("What is the total amount? "))
-individual_amounts = []
+from flask import Flask, render_template, request
 
-num_people = int(input("How many people are there? "))
+app = Flask(__name__)
 
-for i in range(num_people):
-    person = input("Who is it? ")
-    People.append(person)
+@app.route("/", methods=["GET", "POST"])
+def home():
 
-pay_equally = input("Do you want everyone to pay equally? (yes/no) ")
+    rezultat = []
 
-if pay_equally == "yes":
-    amount_per_person = total_amount / num_people
-    print("Each person has to pay:", amount_per_person)
-else:
-    for i in range(num_people):
-        individual_amount = int(input(f"How much should {People[i]} pay separately? "))
-        individual_amounts.append(individual_amount)
-        print(individual_amounts)
+    if request.method == "POST":
 
-individual_total = sum(individual_amounts)
-remaining_total = total_amount - individual_total
-shared_amount = remaining_total / num_people
+        total_amount = float(request.form["total"])
+        num_people = int(request.form["num_people"])
 
-print("Each person has to pay an additional:", shared_amount)
+        people = []
+        for i in range(num_people):
+            people.append(request.form[f"person{i}"])
 
-for i in range(num_people):
-    print(f"{People[i]} has to pay: {individual_amounts[i]} + {shared_amount} = {individual_amounts[i] + shared_amount:.2f}")
+        pay_equally = request.form["equal"]
+
+        if pay_equally == "yes":
+
+            amount = total_amount / num_people
+
+            for p in people:
+                rezultat.append({
+                    "name": p,
+                    "amount": round(amount,2)
+                })
+
+        else:
+
+            individual_amounts = []
+
+            for i in range(num_people):
+                individual_amounts.append(float(request.form[f"amount{i}"]))
+
+            remaining = total_amount - sum(individual_amounts)
+            shared = remaining / num_people
+
+            for i in range(num_people):
+                rezultat.append({
+                    "name": people[i],
+                    "amount": round(individual_amounts[i] + shared,2)
+                })
+
+    return render_template("index.html", rezultat=rezultat)
+
+if __name__ == "__main__":
+    app.run(debug=True)

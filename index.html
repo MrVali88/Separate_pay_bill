@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bill Splitter</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f4f4;
+    padding:30px;
+}
+
+.container{
+    max-width:600px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,.2);
+}
+
+input,button,select{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+}
+
+.person{
+    margin-bottom:10px;
+}
+
+#result{
+    margin-top:20px;
+    font-weight:bold;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h2>Bill Splitter by Valentin Bugeax</h2>
+
+<label>Total amount</label>
+<input type="number" id="total">
+
+<label>Number of people</label>
+<input type="number" id="numPeople">
+
+<button onclick="generatePeople()">Continue</button>
+
+<div id="peopleInputs"></div>
+
+<div id="equalChoice" style="display:none;">
+<label>Split equally?</label>
+
+<select id="equal">
+<option value="yes">Yes</option>
+<option value="no">No</option>
+</select>
+
+<button onclick="calculate()">Calculate</button>
+</div>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+function generatePeople(){
+
+    const n = parseInt(document.getElementById("numPeople").value);
+
+    let html="";
+
+    for(let i=0;i<n;i++){
+
+        html+=`
+        <div class="person">
+        <input type="text" placeholder="Person ${i+1}" class="name">
+        </div>
+        `;
+
+    }
+
+    document.getElementById("peopleInputs").innerHTML=html;
+    document.getElementById("equalChoice").style.display="block";
+}
+
+function calculate(){
+
+    const total=parseFloat(document.getElementById("total").value);
+    const n=parseInt(document.getElementById("numPeople").value);
+    const equal=document.getElementById("equal").value;
+
+    const names=document.getElementsByClassName("name");
+
+    let people=[];
+    let html="";
+
+    for(let i=0;i<n;i++){
+        people.push(names[i].value || `Person ${i+1}`);
+    }
+
+    if(equal==="yes"){
+
+        let amount=total/n;
+
+        html+=`<h3>Each person pays ${amount.toFixed(2)}</h3>`;
+
+        for(let i=0;i<n;i++){
+            html+=`${people[i]}: ${amount.toFixed(2)}<br>`;
+        }
+
+    }
+
+    else{
+
+        let individual=[];
+
+        for(let i=0;i<n;i++){
+
+            let value=parseFloat(prompt(`How much should ${people[i]} pay separately?`));
+
+            if(isNaN(value))
+                value=0;
+
+            individual.push(value);
+
+        }
+
+        let individualTotal=individual.reduce((a,b)=>a+b,0);
+
+        let remaining=total-individualTotal;
+
+        let shared=remaining/n;
+
+        html+=`<h3>Additional amount for everyone: ${shared.toFixed(2)}</h3><br>`;
+
+        for(let i=0;i<n;i++){
+
+            html+=`${people[i]} pays ${individual[i].toFixed(2)} + ${shared.toFixed(2)} = <b>${(individual[i]+shared).toFixed(2)}</b><br>`;
+
+        }
+
+    }
+
+    document.getElementById("result").innerHTML=html;
+
+}
+
+</script>
+
+</body>
+</html>
